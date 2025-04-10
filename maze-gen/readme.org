@@ -1,0 +1,11 @@
+#+title: readme
+#+author: Bartev
+#+date: 2025-04-10
+
+
+From a youtube video by ArjanCodes
+
+[[https://www.youtube.com/watch?v=c8QXUrvSSyg]]
+
+Files are at [[https://github.com/ArjanCodes/examples/tree/main/2024/streamlit]]
+
