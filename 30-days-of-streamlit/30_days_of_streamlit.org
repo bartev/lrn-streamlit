@@ -1,0 +1,10 @@
+#+title: 30_days_of_streamlit
+#+author: Bartev
+#+date: 2025-04-10
+
+* Links
+- [[https://30days.streamlit.app][30 Days of Streamlit]]
+- [[https://docs.streamlit.io/][Streamlit documentation]]
+- [[https://docs.streamlit.io/library/cheatsheet][cheatsheet]]
+- [[https://blog.streamlit.io/how-to-master-streamlit-for-data-science/][Blog]] How to master streamlit for data science
+  

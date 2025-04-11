@@ -1,0 +1,11 @@
+#+title: day04
+#+author: Bartev
+#+date: 2025-04-10
+
+Ken Jee's YouTube data
+
+[[https://www.kaggle.com/datasets/kenjee/ken-jee-youtube-data][link to data download (Kaggle)]]
+
+
+
+
