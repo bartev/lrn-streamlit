@@ -100,6 +100,15 @@ def style_pos_neg(v):
         return None
 
 
+def audience_simple(country):
+    """Map country codes to simplified labels."""
+    mapping = {
+        "US": "USA",
+        "IN": "India",
+    }
+    return mapping.get(country, "Other")
+
+
 # Load data
 
 
@@ -271,3 +280,37 @@ if add_sidebar == "Aggregate Metrics":
 
 if add_sidebar == "Individual Video Analysis":
     st.write("Ind")
+    # `options` is an iterable (list, set, tuple, st.dataframe (uses 1st col))
+    video_select = st.selectbox(
+        label="Pick a Video", options=df_agg["Video title"], index=None
+    )
+
+    agg_filtered = df_agg[lambda x: x["Video title"] == video_select]
+    agg_sub_filtered = (
+        df_agg_sub.loc[lambda x: x["Video Title"] == video_select]
+        .assign(Country=lambda x: x["Country Code"].apply(audience_simple))
+        .sort_values("Is Subscribed")
+    )
+    # Set consistent category order for the y-axis and legend
+    category_orders = {
+        "Is Subscribed": [True, False],
+        "Country": ["USA", "India", "Other"],  # ← country_order
+    }
+    # Fix the color mapping
+    color_map = {
+        "USA": "#1f77b4",  # blue
+        "India": "#ff7f0e",  # orange
+        "Other": "#2ca02c",  # green
+    }
+    fig = px.bar(
+        data_frame=agg_sub_filtered,
+        x="Views",
+        y="Is Subscribed",
+        color="Country",
+        orientation="h",
+        category_orders=category_orders,
+        # color_discrete_map=color_map,
+    )
+    st.plotly_chart(fig)
+
+    st.plotly_chart(px.colors.qualitative.swatches())
