@@ -164,8 +164,66 @@ df_agg_diff.iloc[:, numeric_cols] = (
     df_agg_diff.iloc[:, numeric_cols] - median_agg
 ).div(median_agg)
 
-# st.markdown("Median Agg")
-# st.dataframe(median_agg)
+# Merge daily data with publish data to get delta
+df_time_diff = pd.merge(
+    df_time,
+    df_agg.loc[:, ["Video", "Video publish time"]],
+    left_on="External Video ID",
+    right_on="Video",
+).assign(days_published=lambda x: (x["Date"] - x["Video publish time"]).dt.days)
+
+# Get last 12 months of data rather than all data
+date_12mo = df_agg["Video publish time"].max() - pd.DateOffset(months=12)
+df_time_diff_yr = df_time_diff[lambda x: x["Video publish time"] >= date_12mo]
+
+
+# Get daily view data (first 30), median & percentiles
+def pct_80(x):
+    return np.percentile(x, 80)
+
+
+def pct_20(x):
+    return np.percentile(x, 20)
+
+
+views_days = (
+    pd.pivot_table(
+        df_time_diff_yr,
+        index="days_published",
+        values="Views",
+        aggfunc=[
+            np.mean,
+            np.median,
+            pct_80,
+            pct_20,
+            # lambda x: np.percentile(x, 80),  # 80th percentile
+            # lambda x: np.percentile(x, 20),  # 20th percentile
+        ],
+    )
+    .reset_index()
+    .pipe(
+        lambda df: df.set_axis(
+            [
+                "days_published",
+                "mean_views",
+                "median_views",
+                "80pct_views",
+                "20pct_views",
+            ],
+            axis=1,
+        )
+    )
+    .loc[lambda df: df["days_published"].between(0, 30)]
+)
+views_cumulative = views_days.loc[
+    :, ["days_published", "median_views", "80pct_views", "20pct_views"]
+].assign(
+    **{
+        "median_views": lambda df: df["median_views"].cumsum(),
+        "80pct_views": lambda df: df["80pct_views"].cumsum(),
+        "20pct_views": lambda df: df["20pct_views"].cumsum(),
+    }
+)
 
 
 ## What metrics will be relevant?
@@ -313,4 +371,51 @@ if add_sidebar == "Individual Video Analysis":
     )
     st.plotly_chart(fig)
 
-    st.plotly_chart(px.colors.qualitative.swatches())
+    agg_time_filtered = df_time_diff[lambda x: x["Video Title"] == video_select]
+    first_30 = agg_time_filtered[
+        lambda x: x["days_published"].between(0, 30)
+    ].sort_values("days_published")
+
+    fig2 = go.Figure()
+    fig2.add_trace(
+        go.Scatter(
+            x=views_cumulative["days_published"],
+            y=views_cumulative["20pct_views"],
+            mode="lines",
+            name="20th percentile",
+            line=dict(color="purple", dash="dash"),
+        )
+    )
+    fig2.add_trace(
+        go.Scatter(
+            x=views_cumulative["days_published"],
+            y=views_cumulative["median_views"],
+            mode="lines",
+            name="50th percentile",
+            line=dict(color="black", dash="dash"),
+        )
+    )
+    fig2.add_trace(
+        go.Scatter(
+            x=views_cumulative["days_published"],
+            y=views_cumulative["80pct_views"],
+            mode="lines",
+            name="80th percentile",
+            line=dict(color="royalblue", dash="dash"),
+        )
+    )
+    fig2.add_trace(
+        go.Scatter(
+            x=first_30["days_published"],
+            y=first_30["Views"].cumsum(),
+            mode="lines",
+            name="Current Video",
+            line=dict(color="firebrick", width=8),
+        )
+    )
+    fig2.update_layout(
+        title="View comparison first 30 days",
+        xaxis_title="Days Since Published",
+        yaxis_title="Cumulative Views",
+    )
+    st.plotly_chart(fig2)
