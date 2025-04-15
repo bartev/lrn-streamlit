@@ -7,4 +7,10 @@
 - [[https://docs.streamlit.io/][Streamlit documentation]]
 - [[https://docs.streamlit.io/library/cheatsheet][cheatsheet]]
 - [[https://blog.streamlit.io/how-to-master-streamlit-for-data-science/][Blog]] How to master streamlit for data science
-  
+
+* Day 6 - Create GitHub acct
+
+* Day 7 - Deploy an app
+[[id:7EF3A864-0E8B-4FD2-B0D6-E94C1B9D7747][Streamlit Community Cloud - deploy]]
+
+* Day 8 - =st.slider=
