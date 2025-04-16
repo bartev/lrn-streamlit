@@ -10,6 +10,7 @@ dependencies = [
   "plotly>=6.0.1",
   "py_wanderer",
   "streamlit>=1.44.1",
+  "vega-datasets>=0.9.0",
 ]
 
 [dependency-groups]
