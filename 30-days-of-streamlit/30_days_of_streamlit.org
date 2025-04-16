@@ -14,3 +14,5 @@
 [[id:7EF3A864-0E8B-4FD2-B0D6-E94C1B9D7747][Streamlit Community Cloud - deploy]]
 
 * Day 8 - =st.slider=
+
+* Day 13 Spin up a cloud development environment
